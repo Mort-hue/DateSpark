@@ -30,7 +30,6 @@
         radial-gradient(ellipse at 90% 80%, rgba(212,149,106,0.08) 0%, transparent 50%);
     }
 
-    /* Floating hearts */
     .hearts-bg {
       position: fixed;
       top: 0; left: 0;
@@ -53,7 +52,6 @@
       100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
     }
 
-    /* Header */
     header {
       text-align: center;
       padding: 50px 20px 30px;
@@ -89,7 +87,6 @@
       line-height: 1.7;
     }
 
-    /* Main */
     .main {
       max-width: 860px;
       margin: 0 auto;
@@ -98,7 +95,6 @@
       z-index: 1;
     }
 
-    /* Filter card */
     .filter-card {
       background: #fff;
       border-radius: 24px;
@@ -178,7 +174,6 @@
 
     .generate-btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
 
-    /* Chat area */
     .chat-card {
       background: #fff;
       border-radius: 24px;
@@ -220,7 +215,6 @@
 
     .reset-btn:hover { background: var(--rose-pale); }
 
-    /* Chat messages */
     .chat-messages {
       padding: 24px 28px;
       display: flex;
@@ -278,7 +272,6 @@
       letter-spacing: 0.05em;
     }
 
-    /* Typing indicator */
     .typing-bubble {
       background: var(--rose-pale);
       padding: 14px 18px;
@@ -311,7 +304,6 @@
       50%       { transform: scale(1);   opacity: 1; }
     }
 
-    /* Chat input */
     .chat-input-area {
       padding: 16px 20px;
       border-top: 1px solid rgba(232,67,106,0.1);
@@ -385,7 +377,6 @@
 
   <div class="main">
 
-    <!-- Filters -->
     <div class="filter-card" id="filterCard">
       <h2>💕 Plan Your Perfect Date</h2>
 
@@ -457,7 +448,6 @@
       </button>
     </div>
 
-    <!-- Chat Card -->
     <div class="chat-card" id="chatCard">
       <div class="chat-header">
         <div class="chat-header-title">💬 Your Date Planner</div>
@@ -465,7 +455,6 @@
       </div>
 
       <div class="chat-messages" id="chatMessages">
-        <!-- Typing indicator -->
         <div class="message assistant" id="typingIndicator" style="display:none;">
           <div class="message-label">DateSpark ✨</div>
           <div class="typing-bubble visible">
@@ -491,7 +480,6 @@
   </div>
 
   <script>
-    // Spawn floating hearts
     const heartsBg = document.getElementById('heartsBg');
     const heartEmojis = ['❤️', '🌹', '💕', '✨', '💗', '🌸', '💫', '🥂'];
     for (let i = 0; i < 18; i++) {
@@ -505,7 +493,6 @@
       heartsBg.appendChild(h);
     }
 
-    // Auto-detect season
     const month = new Date().getMonth();
     const seasonSelect = document.getElementById('season');
     if (month >= 2 && month <= 4) seasonSelect.value = 'spring';
@@ -513,7 +500,6 @@
     else if (month >= 8 && month <= 10) seasonSelect.value = 'fall';
     else seasonSelect.value = 'winter';
 
-    // Conversation history
     let conversationHistory = [];
     let systemPrompt = '';
 
@@ -537,7 +523,7 @@ The couple's preferences:
 - Time available: ${time}
 ${extra ? `- Additional context: ${extra}` : ''}
 
-Your job is to have a helpful, warm, conversational back-and-forth with the user. 
+Your job is to have a helpful, warm, conversational back-and-forth with the user.
 - For the FIRST message, provide: 3 date ideas, a full itinerary for the best one, 5 conversation starters, and 4 gift ideas with prices.
 - For follow-up messages, respond naturally to what they ask — refine ideas, change details, add more suggestions, answer questions, etc.
 - Keep responses warm, romantic, and practical.
@@ -553,13 +539,8 @@ Your job is to have a helpful, warm, conversational back-and-forth with the user
       systemPrompt = buildSystemPrompt();
       conversationHistory = [];
 
-      // Show chat card
-      document.getElementById('filterCard').style.marginBottom = '24px';
       document.getElementById('chatCard').classList.add('visible');
-
-      const firstMessage = "Hi! I'm ready to plan the perfect date. Based on everything you've told me, let me put together some ideas!";
-
-      conversationHistory.push({ role: 'user', content: firstMessage });
+      conversationHistory.push({ role: 'user', content: "Hi! I'm ready to plan the perfect date. Based on everything you've told me, let me put together some ideas!" });
 
       showTyping(true);
 
@@ -607,23 +588,27 @@ Your job is to have a helpful, warm, conversational back-and-forth with the user
       sendBtn.disabled = false;
       input.focus();
     }
-async function callAPI() {
-  const response = await fetch('/.netlify/functions/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      system: systemPrompt,
-      messages: conversationHistory
-    })
-  });
-const data = await response.json();
-console.log('API response:', data);
-if (data.content && data.content[0]) {
-  return data.content[0].text;
-} else {
-  console.error('Unexpected response:', data);
-  throw new Error('Bad response from API');
-}
+
+    async function callAPI() {
+      const response = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: systemPrompt,
+          messages: conversationHistory
+        })
+      });
+
+      const data = await response.json();
+      console.log('API response:', data);
+
+      if (data.content && data.content[0]) {
+        return data.content[0].text;
+      } else {
+        console.error('Unexpected response:', data);
+        throw new Error('Bad response from API');
+      }
+    }
 
     function appendMessage(role, text) {
       const messages = document.getElementById('chatMessages');
@@ -642,8 +627,6 @@ if (data.content && data.content[0]) {
 
       msg.appendChild(label);
       msg.appendChild(bubble);
-
-      // Insert before typing indicator
       messages.insertBefore(msg, typingEl);
       messages.scrollTop = messages.scrollHeight;
     }
@@ -660,7 +643,6 @@ if (data.content && data.content[0]) {
         e.preventDefault();
         sendMessage();
       }
-      // Auto-resize textarea
       const ta = document.getElementById('chatInput');
       ta.style.height = 'auto';
       ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
@@ -669,7 +651,6 @@ if (data.content && data.content[0]) {
     function resetChat() {
       conversationHistory = [];
       const messages = document.getElementById('chatMessages');
-      // Remove all messages except typing indicator
       Array.from(messages.children).forEach(child => {
         if (child.id !== 'typingIndicator') child.remove();
       });
