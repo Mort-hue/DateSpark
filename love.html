@@ -607,26 +607,19 @@ Your job is to have a helpful, warm, conversational back-and-forth with the user
       sendBtn.disabled = false;
       input.focus();
     }
-
 async function callAPI() {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'x-api-key': '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',
-          'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1500,
-          system: systemPrompt,
-          messages: conversationHistory
-        })
-      });
+  const response = await fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system: systemPrompt,
+      messages: conversationHistory
+    })
+  });
 
-      const data = await response.json();
-      return data.content[0].text;
-    }
+  const data = await response.json();
+  return data.content[0].text;
+}
 
     function appendMessage(role, text) {
       const messages = document.getElementById('chatMessages');
