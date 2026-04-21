@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DateSpark ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --rose: #e8436a;
+      --rose-light: #f7879d;
+      --rose-pale: #fde8ee;
+      --cream: #fff9f5;
+      --text: #2d1518;
+      --text-dim: #8b5e65;
+      --shadow: 0 8px 40px rgba(232, 67, 106, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-image:
+        radial-gradient(ellipse at 10% 20%, rgba(232,67,106,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 80%, rgba(212,149,106,0.09) 0%, transparent 50%);
+      overflow: hidden;
+    }
+
+    /* Floating hearts bg */
+    .hearts-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .heart-float {
+      position: absolute;
+      opacity: 0.06;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.06; }
+      90%  { opacity: 0.06; }
+      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+    }
+
+    /* Gate card */
+    .gate {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    .gate-card {
+      background: #fff;
+      border-radius: 28px;
+      padding: 48px 40px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(232,67,106,0.12);
+    }
+
+    .gate-emoji {
+      font-size: 3rem;
+      margin-bottom: 14px;
+      display: block;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .gate-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1;
+    }
+
+    .gate-title span { color: var(--rose); font-style: italic; }
+
+    .gate-subtitle {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 14px 20px;
+      border: 2px solid rgba(232,67,106,0.2);
+      border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.1rem;
+      color: var(--text);
+      background: var(--cream);
+      outline: none;
+      text-align: center;
+      letter-spacing: 0.15em;
+      transition: border-color 0.2s, transform 0.1s;
+      margin-bottom: 14px;
+    }
+
+    .password-input:focus { border-color: var(--rose); }
+
+    .password-input.shake {
+      animation: shake 0.4s ease;
+      border-color: var(--rose);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(6px); }
+    }
+
+    .enter-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--rose) 0%, #c4304f 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .enter-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,67,106,0.3);
+    }
+
+    .enter-btn:active { transform: translateY(0); }
+
+    /* Wrong message */
+    .wrong-msg {
+      margin-top: 20px;
+      padding: 14px 18px;
+      background: var(--rose-pale);
+      border-radius: 12px;
+      color: var(--rose);
+      font-size: 0.92rem;
+      font-weight: 600;
+      display: none;
+      animation: fadeUp 0.3s ease;
+    }
+
+    .wrong-msg.visible { display: block; }
+
+    .wrong-msg .wrong-emoji {
+      font-size: 1.4rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Big heart overlay */
+    .heart-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+    }
+
+    .heart-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .big-heart {
+      font-size: 12rem;
+      animation: heartPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      line-height: 1;
+    }
+
+    @keyframes heartPop {
+      0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+      60%  { transform: scale(1.2) rotate(5deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    /* Attempt counter */
+    .attempt-counter {
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating hearts -->
+  <div class="hearts-bg" id="heartsBg"></div>
+
+  <!-- Password Gate -->
+  <div class="gate">
+    <div class="gate-card">
+      <span class="gate-emoji">🔐</span>
+      <div class="gate-title">Date<span>Spark</span></div>
+      <p class="gate-subtitle">This is a private space 💕<br/>Enter the password to continue.</p>
+
+      <input
+        type="password"
+        class="password-input"
+        id="passwordInput"
+        placeholder="Password"
+        onkeydown="if(event.key==='Enter') checkPassword()"
+        autocomplete="off"
+      />
+
+      <button class="enter-btn" onclick="checkPassword()">Enter ➤</button>
+
+      <div class="wrong-msg" id="wrongMsg">
+        <span class="wrong-emoji" id="wrongEmoji"></span>
+        <span id="wrongText"></span>
+      </div>
+
+      <div class="attempt-counter" id="attemptCounter"></div>
+    </div>
+  </div>
+
+  <!-- Heart overlay for correct password -->
+  <div class="heart-overlay" id="heartOverlay">
+    <div class="big-heart">❤️</div>
+  </div>
+
+  <script>
+    // Spawn floating hearts
+    const heartsBg = document.getElementById('heartsBg');
+    const heartEmojis = ['❤️', '🌹', '💕', '✨', '💗', '🌸', '💫'];
+    for (let i = 0; i < 16; i++) {
+      const h = document.createElement('div');
+      h.className = 'heart-float';
+      h.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+      h.style.left = Math.random() * 100 + 'vw';
+      h.style.animationDuration = (Math.random() * 15 + 12) + 's';
+      h.style.animationDelay = (Math.random() * 12) + 's';
+      h.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
+      heartsBg.appendChild(h);
+    }
+
+    const CORRECT_PASSWORD = 'Mort4';
+    let attempts = 0;
+
+    const wrongMessages = [
+      { emoji: '😂', text: "That's definitely not it... did you even try?" },
+      { emoji: '🤔', text: "Hmm. Wrong. Are you even supposed to be here?" },
+      { emoji: '💀', text: "Nope. Not even close. Walk of shame, please." },
+      { emoji: '🚨', text: "WRONG PASSWORD. Security has been notified. (Just kidding. But still, no.)" },
+      { emoji: '😭', text: "Babe... it's not that hard. Or maybe it is for you." },
+      { emoji: '🤡', text: "Clown behavior detected. Try again." },
+      { emoji: '🥴', text: "Are you okay? That was... not the password." },
+      { emoji: '👀', text: "Wrong. I'm starting to question everything about you." },
+      { emoji: '😤', text: "Still wrong?! I'm not mad, I'm just disappointed." },
+      { emoji: '🫠', text: "At this point I genuinely don't know what to tell you." },
+    ];
+
+    function checkPassword() {
+      const input = document.getElementById('passwordInput');
+      const val = input.value;
+
+      if (val === CORRECT_PASSWORD) {
+        // Correct — flash heart then redirect
+        const overlay = document.getElementById('heartOverlay');
+        overlay.classList.add('show');
+
+        setTimeout(() => {
+          overlay.style.transition = 'opacity 1s ease';
+          overlay.style.opacity = '0';
+          setTimeout(() => {
+            window.location.href = 'love.html';
+          }, 1000);
+        }, 1200);
+
+      } else {
+        // Wrong — shake and show funny message
+        attempts++;
+        input.value = '';
+        input.classList.remove('shake');
+        void input.offsetWidth; // force reflow to restart animation
+        input.classList.add('shake');
+        setTimeout(() => input.classList.remove('shake'), 400);
+
+        const msg = wrongMessages[(attempts - 1) % wrongMessages.length];
+        const wrongMsg = document.getElementById('wrongMsg');
+        document.getElementById('wrongEmoji').textContent = msg.emoji;
+        document.getElementById('wrongText').textContent = msg.text;
+        wrongMsg.classList.remove('visible');
+        void wrongMsg.offsetWidth;
+        wrongMsg.classList.add('visible');
+
+        const counter = document.getElementById('attemptCounter');
+        counter.textContent = attempts === 1
+          ? '1 attempt so far 👀'
+          : `${attempts} attempts so far... yikes 😬`;
+
+        input.focus();
+      }
+    }
+  </script>
+
+</body>
+</html>
